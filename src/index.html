@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <title>Test</title>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="row" id="">
+        <div class="col">
+            <div id="search-form">
+                <div class="form-group">
+                    <label for="lat">Latitude</label>
+                    <input type="text" class="form-control" id="lat">
+                </div>
+
+                <div class="form-group">
+                    <label for="lat">Longitude</label>
+                    <input type="text" class="form-control" id="lng">
+                </div>
+
+                <div class="form-group">
+                    <label for="lat">Radius (meters)</label>
+                    <input type="number" class="form-control" id="radius" value="5000">
+                </div>
+
+                <div class="form-group">
+                    <label for="lat">Types of places (multiple)</label>
+                    <select multiple name="" class="form-control" id="type">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="lat">Keyword (optional)</label>
+                    <input type="text" class="form-control" id="keyword" placeholder="">
+                </div>
+
+                <div class="search-button">
+                    <button class="btn btn-success text-center" id="search_button">Search</button>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div id="map"></div>
+        </div>
+    </div>
+    <div class="row">
+        <h2>Results: <span id="results_count"></span></h2>
+        <table id="results" class="table">
+            <thead>
+            <tr>
+                <td>Company Name</td>
+                <td>Company Website</td>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="/node_modules/jquery/dist/jquery.js"></script>
+<script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDjW55JGRtxQ8b4_btzyT3zuE_YLZztLYU&libraries=places"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

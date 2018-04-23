@@ -1,0 +1,25 @@
+.btn, .form-control {
+    border-radius: 0 !important;
+}
+
+.main-container {
+    margin: 50px 50px;
+}
+
+#map {
+    width: 100%;
+    height: 600px;
+}
+
+#search-form > * {
+    margin-bottom: 10px;
+}
+
+.search-button {
+    text-align: center;
+    width: 100%;
+}
+
+#results {
+    margin: 50px;
+}
