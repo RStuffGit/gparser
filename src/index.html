@@ -8,6 +8,8 @@
 </head>
 <body>
 
+
+<h1 class="text-center" id="title">Find Google Places</h1>
 <div class="main-container">
     <div class="row" id="">
         <div class="col">
@@ -46,17 +48,37 @@
             <div id="map"></div>
         </div>
     </div>
-    <div class="row">
-        <h2>Results: <span id="results_count"></span></h2>
+    <hr>
+    <div class="row" id="results-container">
+        <h2 class="text-center">Results: <span id="results_count">0</span></h2>
         <table id="results" class="table">
             <thead>
             <tr>
+                <td>#</td>
+                <td></td>
                 <td>Company Name</td>
                 <td>Company Website</td>
+                <td>International Phone Number</td>
             </tr>
             </thead>
             <tbody></tbody>
         </table>
+    </div>
+
+    <div id="send_results" class="text-center">
+        <button class="btn btn-danger text-center" id="save_results">Save Results</button>
+    </div>
+</div>
+
+<div id="loading">
+    <div class="textMessage"></div>
+    <div class="spinner">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+        <div class="bounce4"></div>
+        <div class="bounce5"></div>
+        <div class="bounce6"></div>
     </div>
 </div>
 

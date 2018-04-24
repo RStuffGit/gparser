@@ -363,6 +363,8 @@ $(document).ready(function () {
         }
     ];
 
+    var places = [];
+
     function initPage() {
         var $dropdown = $("#type");
         types.forEach(function (item) {
@@ -379,6 +381,24 @@ $(document).ready(function () {
         }
         search();
     });
+    $('#save_results').click(function () {
+        if (places.length > 0) {
+            var textMessageContainer = $('#loading > .textMessage');
+            textMessageContainer.text("");
+            switchLoader(true);
+            $.ajax({
+                type: "POST",
+                contentType: 'application/json',
+                data:  JSON.stringify(places),
+                dataType: "json",
+                url: "/save",
+                complete: function () {
+                    switchLoader(false);
+                    alert("Successfully saved!");
+                }
+            });
+        }
+    });
 
     $('#radius').change(function (event) {
         drawCircle(event.target.value);
@@ -390,46 +410,75 @@ $(document).ready(function () {
     var service;
 
     function search() {
-        $('#results > tbody').empty();
+        switchLoader(true);
+        var tbody = $("#results > tbody");
+        tbody.empty();
         var request = {
             location: new google.maps.LatLng(parseFloat($('#lat').val()), parseFloat($('#lng').val())),
             radius: $('#radius').val(),
             types: $('#type').val()
         };
-        service.nearbySearch(request, function (data) {
-            var ids = data.map(function (item) {
-                return item.place_id;
-            });
+        var textMessageContainer = $('#loading > .textMessage');
+        var allResultsCount = 0;
+        var tbodyContent = '';
+        places = [];
+        service.radarSearch(request, function (data, status) {
+            // service.nearbySearch(request, function (data) {
+            allResultsCount = data.length;
 
-            $("#results_count").text(ids.length);
+            if (status !== google.maps.places.PlacesServiceStatus.OK) return false;
+            $("#results_count").text(allResultsCount);
 
-            ids.forEach(function (id) {
-                service.getDetails({placeId: id}, function (data) {
-                    if (data) {
-                        $("#results > tbody").append('<tr><td>' + data.name + '</td><td>' + (data.website ? data.website : 'No Site') + '</td></tr>');
-                    }
-                });
+            if (!allResultsCount) {
+                switchLoader(false);
+                return;
+            }
+
+            data.forEach(function (item, i) {
+                setTimeout(function () {
+                    service.getDetails({placeId: item.place_id}, function (data, status) {
+                        if (status === google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT) {
+                            alert("Query limit is reached!");
+                        }
+
+                        if (status !== google.maps.places.PlacesServiceStatus.OK)  return false;
+
+                        var photo = typeof data.photos !== 'undefined' && data.photos.length > 0
+                            ? data.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100})
+                            : '';
+
+                        var current = i + 1;
+
+                        places.push({
+                            number: current,
+                            name: data.name.replace(/['"]+/g, ''),
+                            website: data.website ? data.website : '',
+                            phone: data.international_phone_number
+                        });
+
+
+                        if (data) {
+                            tbodyContent += '<tr><td>' + current + '</td><td><img src="' + photo + '"></td><td>' + data.name + '</td><td>' + (data.website ? ("<a href='" + data.website + "'>" + data.website + "</a>") : 'No Site') + '</td><td>' + data.international_phone_number + '</td></tr>';
+                        }
+                        if (parseInt(allResultsCount) === parseInt(current)) {
+                            switchLoader(false);
+                            tbody.append(tbodyContent);
+                        } else {
+                            textMessageContainer.html("Processed: " + (current) + " <br>Left: " + (allResultsCount - (current)));
+                        }
+                    });
+                }, i * 200);
             });
 
         });
+    }
 
-
-        // var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyDjW55JGRtxQ8b4_btzyT3zuE_YLZztLYU&rankby=distance";
-        // url += "&location=" + $('#lat').val() + "," + $('#lng').val();
-        // url += "&types=" + $('#type').val().join(",");
-        //
-        // $.getJSON( url, function( data ) {
-        //     var items = [];
-        //     console.log(data);
-        //     // $.each( data, function( key, val ) {
-        //     //     items.push( "<li id='" + key + "'>" + val + "</li>" );
-        //     // });
-        //     //
-        //     // $( "<ul/>", {
-        //     //     "class": "my-new-list",
-        //     //     html: items.join( "" )
-        //     // }).appendTo( "#results" );
-        // });
+    function switchLoader(val) {
+        if (!val) {
+            $('#loading').css('display', 'none')
+        } else {
+            $('#loading').css('display', 'flex')
+        }
     }
 
     function initialize() {
@@ -437,8 +486,7 @@ $(document).ready(function () {
 
         map = new google.maps.Map(document.getElementById('map'), {
             center: latLng,
-            zoom: 10,
-            scrollwheel: false
+            zoom: 10
         });
 
         service = new google.maps.places.PlacesService(map);
@@ -473,33 +521,6 @@ $(document).ready(function () {
         });
         circle.bindTo('center', marker, 'position');
     }
-
-    /*
-     var request = {
-     location: pyrmont,
-     radius: '500',
-     types: ['store']
-     };
-
-     // Create the PlaceService and send the request.
-     // Handle the callback with an anonymous function.
-     var service = new google.maps.places.PlacesService(map);
-     service.nearbySearch(request, function (results, status) {
-     if (status == google.maps.places.PlacesServiceStatus.OK) {
-     for (var i = 0; i < results.length; i++) {
-     var place = results[i];
-     // If the request succeeds, draw the place location on
-     // the map as a marker, and register an event to handle a
-     // click on the marker.
-     var marker = new google.maps.Marker({
-     map: map,
-     position: place.geometry.location
-     });
-     }
-     }
-     });
-     */
-
 
     initPage();
 });
