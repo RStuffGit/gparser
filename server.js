@@ -1,9 +1,7 @@
 var express = require('express');
 const bodyParser = require("body-parser");
-var csvWriter = require('csv-write-stream');
-var writer = csvWriter();
-var fs = require('fs');
-
+var jsonfile = require('jsonfile');
+var file = 'data.json';
 var app = express();
 var port = 3000;
 
@@ -23,13 +21,9 @@ app.use(bodyParser.json());
 
 app.post('/save', function (request, response) {
     if (request.body && request.body.length > 0) {
-        var writer = csvWriter({separator: '|', headers: ["number", "name", "website", "phone"]});
-        writer.pipe(fs.createWriteStream('out.csv'));
-        request.body.forEach(function (item) {
-            writer.write(item);
+        jsonfile.writeFile(file, request.body, function (err) {
+            response.sendStatus(err ? 500 : 200);
         });
-        writer.end();
-        response.sendStatus(200);
     } else {
         response.sendStatus(400);
     }
